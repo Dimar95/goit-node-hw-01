@@ -5,43 +5,54 @@ const path = require("path");
 const contactsPath = path.join(__dirname, "./db/contacts.json");
 
 async function listContacts() {
-  const data = await fs.readFile(contactsPath);
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile(contactsPath);
+    return JSON.parse(data);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-
 async function getContactById(contactId) {
-  const data = await listContacts();
-  const contact = data.find((item) => item.id === contactId);
-  return contact || null;
+  try {
+    const data = await listContacts();
+    const contact = data.find((item) => item.id === contactId);
+    return contact || null;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function removeContact(contactId) {
-  const data = await listContacts();
-  const index = data.findIndex((item) => item.id === contactId);
-  if (index === -1) {
-    return;
+  try {
+    const data = await listContacts();
+    const index = data.findIndex((item) => item.id === contactId);
+    if (index === -1) {
+      return;
+    }
+    const [result] = data.splice(index, 1);
+    await fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
+    return result;
+  } catch (error) {
+    console.log(error);
   }
-  const [result] = data.splice(index, 1);
-
-  await fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
-  return result;
 }
 
 async function addContact(name, email, phone) {
-  const data = await listContacts();
-  const newContact = {
-    id: nanoid(),
-    name,
-    email,
-    phone,
-  };
-  const contactsData = [...data, newContact];
-  await fs.writeFile(
-    contactsPath,
-    JSON.stringify(contactsData, null, 2)
-  );
-  return newContact;
+  try {
+    const data = await listContacts();
+    const newContact = {
+      id: nanoid(),
+      name,
+      email,
+      phone,
+    };
+    const contactsData = [...data, newContact];
+    await fs.writeFile(contactsPath, JSON.stringify(contactsData, null, 2));
+    return newContact;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 module.exports = {
